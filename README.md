@@ -32,7 +32,7 @@ Para fim de comparação no código serão econtrados resultados de três aborda
 
 ### Running
 
-Clone the repo, set an python 3 virtual environment, install the dependencies from requirementes.txt and run the project with one of the options below:
+Clone the repo, download resouces from <https://drive.google.com/file/d/1IEdLVJ0Fzc261jcVwoZvFCC4drBVVGer>, unzip and paste on 'ds-multimodal-emotion-recognition'. Set a python3 virtual environment, install the dependencies from requirementes.txt and run the project with one of the options below:
 
 ```
 python main.py preprocess 
@@ -78,6 +78,14 @@ Pode ser necessária alteração no arquivo de configuração (config/settings.p
   RECOLA_VALIDATION_DIST_PATH_50_TRUE: Distâncias zona de competência previamete salvas, utilizado para otimizar ds com --saved_information
 
 ```
+## Problemas e próximas atividades
+
+O que temos hoje está muito próximo de uma média simples das saídas de todos os regressores. Temos algumas ideias para resolver isso:
+
+- Alterar a fórmula e a penalização dos regressores;
+- Substituir a fórmula por um metaclassificador que infere os pesos de forma indireta (tendo como entrada todas as features concatenadas, a saída dos classificadores ou um conjunto de features extraídos a partir da zona de competência);
+- Otimizar o cálculo da zona de competência para trabalhar com return_sequences = False (considerando um seq_len=50, com return_sequences = True temos 450 x 450 comparações por view e o processo demorou um pouco mais de 2h para calcular as distências entre todos os item de teste x validação das 5 views, com return_sequences = False temos 22350 x 22350 comparações por view e mesmo este cálculo sendo realizado uma única vez seria inviável seguir com o código no formato que está);
+- Otimizar os modelos, incluir novos conjuntos de features e concluir os experimentos com valence.
 
 ## Contact
 
