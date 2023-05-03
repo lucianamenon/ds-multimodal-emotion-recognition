@@ -34,7 +34,7 @@ def ds(k, seq_len, return_sequences, saved_information=False):
     y = flatten_y[:,0]
 
     media(y, preds)
-    dinamic_selection(y, bases, ds_models, final_dist, preds, validation_preds, k, debug=True)
+    dinamic_selection(y, bases, ds_models, final_dist, preds, validation_preds, k, debug=False)
 
 
 def peso_regressor(t, model, dist_t, args, preds, valitation_preds, y, output_shape=(50), threshold=0.5, debug=False):
@@ -225,14 +225,11 @@ def dinamic_selection(y, bases, models, final_dist, test_preds, valitation_preds
     return
 
 
-def final_prediction(y, final_pred, plot=True):
+def final_prediction(y, final_pred, plot=False):
 
     ##Flatten prediction
-    print(y.shape, len(final_pred))
     flatten_final_prediction = list(chain.from_iterable(final_pred))
-    print(y.shape, len(flatten_final_prediction))
     flatten_final_prediction = np.array(flatten_final_prediction)
-    print(y.shape, flatten_final_prediction.shape)
 
     ##Plot RESULTS
     if flatten_final_prediction.shape[0] == 22500:

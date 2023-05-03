@@ -10,7 +10,7 @@ All experiments were carried out with pre-processed features available in the RE
 
 ### Proposed method:
 
-!images/metodo.png
+![image](https://raw.githubusercontent.com/lucianamenon/ds-multimodal-emotion-recognition/main/images/metodo.png)
 
 A partir de múltiplos modais (áudio, eletrocardiograma e vídeo) e múltiplas views desses modais, numa primeira fase nós temos a geração de um pool de regressores f (todos os regressores são treinados separadamente).
 
@@ -55,8 +55,8 @@ Em *ds* é realizada a seleção dinâmica da melhor representação dos dados (
 
 --saved_information é a flag que define se serão utilizados os dados de predições, train_test_split e distâncias previamete salvos ou se serão recauculados (atenção que neste caso os dados serão sobrescritos).
 
-salvos em RECOLA_PICKLE_PATH_SPLIT_50_TRUE, RECOLA_TEST_PRED_PATH_50_TRUE, 
-RECOLA_VALIDATION_PRED_PATH_50_TRUE, RECOLA_VALIDATION_DIST_PATH_50_TRUE
+  Sugestão de uso inicial: python3 main.py ds --return_sequences --saved_information
+
 ### Configuration file
 
 Pode ser necessária alteração no arquivo de configuração (config/settings.py).
