@@ -51,7 +51,7 @@ Em *train* os modelos serão treinados a partir dos dados de RECOLA_PICKLE_PATH 
 ```
 Em *ds* é realizada a seleção dinâmica da melhor representação dos dados (DS, DW, DWS1, DWS2) a partir dos modelos treinados e listados em PATH_MODELOS. Pode ser utilizado com os valores default de k=15, seq_len=50, return_sequences=False e saved_information=False ou personalizado de acordo com o necessário. 
 
-  Exemplo: python main.py ds --return_sequences --saved_information --seq_len 150 --k 1
+  Exemplo: python main.py ds --return_sequences --saved_information --seq_len 50 --k 1
 
 --saved_information é a flag que define se serão utilizados os dados de predições, train_test_split e distâncias previamete salvos ou se serão recauculados (atenção que neste caso os dados serão sobrescritos).
 
