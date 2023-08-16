@@ -1,12 +1,14 @@
 import config
 import numpy as np
 import pickle
+import io
 
 from sklearn.utils import shuffle
 
 RECOLA_PICKLE_PATH = config.RECOLA_PICKLE_PATH
 SEGMENTS_PER_PERSON = config.SEGMENTS_PER_PERSON
 RECOLA_SUBJECTS = config.RECOLA_SUBJECTS
+RESOURCES_DIR = config.RESOURCES_DIR
 
 import os
 import random
@@ -257,3 +259,21 @@ def pred_lstm_data_transform(y_data, seq_lenght, return_sequences=True):
     y = np.array(y)
 
     return y
+
+def get_model_summary(model):
+
+    stream = io.StringIO()
+    model.summary(print_fn=lambda x: stream.write(x + '\n'))
+    summary_string = stream.getvalue()
+    stream.close()
+    return summary_string
+
+def my_print(texto):
+
+    """ Print and save info in resultados.txt """
+
+    resultados_path = RESOURCES_DIR / f"resultados.txt"
+    resultados = open(resultados_path, 'a')
+
+    print(texto)
+    resultados.write(texto)

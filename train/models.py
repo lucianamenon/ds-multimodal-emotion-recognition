@@ -1,5 +1,7 @@
 import warnings
 warnings.filterwarnings('ignore')
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import tensorflow as tf
 import tensorflow.keras as keras
@@ -88,10 +90,10 @@ def build_model_speech(input_shape, seq_lenght, output_layers=1, return_seq=Fals
     model.add(keras.layers.Dropout(0.5))
 
     # reshape
-    model.add(tf.keras.layers.Reshape((seq_lenght, 512)))
+    model.add(tf.keras.layers.Reshape((seq_lenght, 256)))
 
     # 2 LSTM layers
-    model.add(keras.layers.LSTM(512, return_sequences=True, stateful=False))#, dropout=0.2))#, recurrent_regularizer='l1'))
+    model.add(keras.layers.LSTM(256, return_sequences=True, stateful=False))#, dropout=0.2))#, recurrent_regularizer='l1'))
     if return_seq:
           model.add(keras.layers.LSTM(256, return_sequences=True, stateful=False))#, dropout=0.2))#, recurrent_regularizer='l1'))
     else:
@@ -220,9 +222,9 @@ def create_model(input_shape, teste, seq_lenght, return_seq, modelo, print_summa
     x = model.predict(teste, verbose=0)
 
     if print_summary:
-        print()
-        model.summary()
-        print()
+        utils.my_print("\n")
+        utils.my_print(utils.get_model_summary(model))
+        utils.my_print("\n")
 
     return model
 
@@ -279,9 +281,9 @@ def predict(best_model, X_test, y_test, output_layers, seq_lenght, plot=False, d
         #Calculate CCC
         result = metrics.concordance_cc(pred, actual)
         result2 = metrics.concordance_cc(median_pred, actual)
-        print("CCC (CONCORDANCE CORRELATION COEFFICIENT)")
-        print("CCC SEM Median Filter: ", result)
-        print("CCC COM Median Filter: ", result2)
+        utils.my_print("CCC (CONCORDANCE CORRELATION COEFFICIENT)")
+        utils.my_print(f"\nCCC SEM Median Filter: {result}")
+        utils.my_print(f"\nCCC COM Median Filter: {result2}")
 
     if ds:
         return utils.pred_lstm_data_transform(median_pred, seq_lenght)
@@ -289,24 +291,30 @@ def predict(best_model, X_test, y_test, output_layers, seq_lenght, plot=False, d
 
 def train_model(features, labels, arquitetura, seq_lenght, output_layers=1, texto='', return_seq=False):
 
-    print("#"*120)
-    print(texto)
+    # train model
+    t_inicial = datetime.now()
+    datahora = t_inicial.strftime("%Y%m%d-%H%M%S")
+    checkpoint_path = MODELS_DIR / f"models-{datahora}"
+
+    utils.my_print("#"*120)
+    utils.my_print(f"\n{texto}")
+    utils.my_print(f"seq_lenght, return_seq: {seq_lenght}, {return_seq}\n")
 
     #train/validation/test split
     X_train, X_validation, X_test, y_train, y_validation, y_test = utils.prepare_datasets(features, labels, 3, 3, output_layers)
-    print("train/validation/test split")
-    print("X_train, X_validation, X_test: ", X_train.shape, X_validation.shape, X_test.shape)
-    print("y_train, y_validation, y_test: ", y_train.shape, y_validation.shape, y_test.shape)
-    print()
+    utils.my_print("\ntrain/validation/test split")
+    utils.my_print(f"X_train, X_validation, X_test: {X_train.shape}, {X_validation.shape}, {X_test.shape}")
+    utils.my_print(f"y_train, y_validation, y_test: {y_train.shape}, {y_validation.shape}, {y_test.shape}")
+    utils.my_print("\n")
 
     X_train, y_train = utils.lstm_data_transform(X_train, y_train, seq_lenght, return_sequences=return_seq)
     X_validation, y_validation = utils.lstm_data_transform(X_validation, y_validation, seq_lenght, return_sequences=return_seq)
     X_test, y_test = utils.lstm_data_transform(X_test, y_test, seq_lenght, to_shuffle=False, return_sequences=return_seq)
 
-    print("seq_lenght lstm_data_transform")
-    print("X_train, X_validation, X_test: ", X_train.shape, X_validation.shape, X_test.shape)
-    print("y_train, y_validation, y_test: ", y_train.shape, y_validation.shape, y_test.shape)
-    print()
+    utils.my_print("\nseq_lenght lstm_data_transform")
+    utils.my_print(f"X_train, X_validation, X_test: {X_train.shape}, {X_validation.shape}, {X_test.shape}")
+    utils.my_print(f"y_train, y_validation, y_test: {y_train.shape}, {y_validation.shape}, {y_test.shape}")
+    utils.my_print("\n")
 
     input_shape = (X_train.shape[1], X_train.shape[2])
     if arquitetura == 'speech':
@@ -328,12 +336,8 @@ def train_model(features, labels, arquitetura, seq_lenght, output_layers=1, text
     y_validation = tf.convert_to_tensor(y_validation)
     y_test = tf.convert_to_tensor(y_test)
 
-    # train model
-    t_inicial = datetime.now()
-    datahora = t_inicial.strftime("%Y%m%d-%H%M%S")
-    checkpoint_path = MODELS_DIR / f"models-{datahora}"
     backup_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path, monitor = 'val_loss', verbose=0, save_best_only=True, mode='min')
-    history = model.fit(X_train, y_train, validation_data=(X_validation, y_validation), batch_size=32, epochs=60, callbacks=[backup_callback], verbose=0)
+    history = model.fit(X_train, y_train, validation_data=(X_validation, y_validation), batch_size=32, epochs=1, callbacks=[backup_callback], verbose=0)
 
     try:
         # plot accuracy/error for training and validation
@@ -349,8 +353,9 @@ def train_model(features, labels, arquitetura, seq_lenght, output_layers=1, text
 
         if return_seq: seq_lenght = 0
         predict(best_model, X_test, y_test, output_layers, seq_lenght)
-        print("CHECKPOINT_PATH: ", checkpoint_path)
-        print("#"*120)
+        utils.my_print(f"\nCHECKPOINT_PATH: {checkpoint_path}\n")
+        utils.my_print("#"*120)
+        utils.my_print("\n")
 
         del best_model
         del X_test, y_test
